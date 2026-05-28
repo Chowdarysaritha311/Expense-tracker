@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vesper — Matte Black Expense Tracker</title>
+  <meta name="description" content="Offline-first premium expense tracker with rich visualizations, responsive matte black layout, and simple budgeting tools.">
+  <!-- Google Fonts: Outfit (Brand) & JetBrains Mono (Numbers) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <!-- Root Layout -->
+  <div class="v-app">
+    
+    <!-- Top Header Navigation -->
+    <header class="v-header">
+      <div class="v-header-container">
+        <div class="v-logo-area">
+          <span class="v-logo-icon" id="logo-icon-placeholder"></span>
+          <h1 class="v-title">Vesper</h1>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <nav class="v-nav" aria-label="Main Navigation">
+          <button class="v-nav-tab active" id="tab-dashboard" data-tab="dashboard">
+            <span class="tab-icon" data-icon="chart"></span>
+            <span class="tab-label">Dashboard</span>
+          </button>
+          <button class="v-nav-tab" id="tab-transactions" data-tab="transactions">
+            <span class="tab-icon" data-icon="calendar"></span>
+            <span class="tab-label">Ledger</span>
+          </button>
+          <button class="v-nav-tab" id="tab-settings" data-tab="settings">
+            <span class="tab-icon" data-icon="settings"></span>
+            <span class="tab-label">Settings</span>
+          </button>
+        </nav>
+        
+        <!-- Desktop Header Action -->
+        <div class="v-header-actions">
+          <button class="v-btn v-btn-primary" id="btn-add-desktop">
+            <span class="btn-icon" data-icon="plus"></span>
+            <span>Add Transaction</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Panels -->
+    <main class="v-main-content">
+      
+      <!-- 1. DASHBOARD VIEW -->
+      <section id="view-dashboard" class="v-view-panel active">
+        
+        <!-- Dashboard Sub-Header -->
+        <div class="v-dashboard-header">
+          <h2 class="section-title-main">Financial Overview</h2>
+          <div class="month-select-wrapper">
+            <select id="dashboard-month-select" class="v-input v-select v-month-select" aria-label="Select overview month">
+              <!-- Populated dynamically by JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Overview Cards -->
+        <div class="v-metrics-grid">
+          <div class="v-card v-metric-card" id="card-income">
+            <div class="metric-header">
+              <span class="metric-title">Monthly Income</span>
+              <span class="metric-icon income" data-icon="arrow-up"></span>
+            </div>
+            <div class="metric-value income" id="metric-total-income">₹0.00</div>
+          </div>
+          
+          <div class="v-card v-metric-card" id="card-expenses">
+            <div class="metric-header">
+              <span class="metric-title">Monthly Expenses</span>
+              <span class="metric-icon expense" data-icon="arrow-down"></span>
+            </div>
+            <div class="metric-value expense" id="metric-total-expense">₹0.00</div>
+          </div>
+          
+          <div class="v-card v-metric-card" id="card-savings">
+            <div class="metric-header">
+              <span class="metric-title">Net Savings</span>
+              <span class="metric-icon info" data-icon="wallet"></span>
+            </div>
+            <div class="metric-value" id="metric-net-savings">₹0.00</div>
+          </div>
+        </div>
+
+        <!-- Budget Tracker Card -->
+        <div class="v-card v-budget-card" id="card-budget-tracker">
+          <div class="budget-header">
+            <div>
+              <h3 class="budget-title">Monthly Budget Status</h3>
+              <p class="budget-subtitle" id="budget-progress-text">Spent ₹0.00 of ₹0.00</p>
+            </div>
+            <span class="budget-percentage" id="budget-percentage-badge">0%</span>
+          </div>
+          <!-- Budget Progress Bar -->
+          <div class="v-progress-container">
+            <div class="v-progress-bar" id="budget-progress-bar" style="width: 0%"></div>
+          </div>
+          <div class="budget-footer" id="budget-footer-text">
+            All good! You are well within your monthly limit.
+          </div>
+        </div>
+
+        <!-- Analytics Charts Grid -->
+        <div class="v-charts-grid">
+          <!-- Donut Breakdown Card -->
+          <div class="v-card v-chart-card">
+            <h3 class="chart-card-title">Category Breakdown</h3>
+            <div class="donut-chart-container">
+              <div class="chart-wrapper">
+                <svg id="donut-svg" class="donut-chart" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="#27272a" stroke-width="8"></circle>
+                </svg>
+                <div class="donut-center-label">
+                  <span class="donut-subtitle">Total Spent</span>
+                  <span class="donut-total" id="donut-total-amount">₹0.00</span>
+                </div>
+              </div>
+              
+              <!-- Legend list -->
+              <div class="chart-legend" id="donut-legend">
+                <!-- Filled dynamically by JS -->
+                <p class="empty-text">No expense transactions recorded this month.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spend Trend Card -->
+          <div class="v-card v-chart-card">
+            <h3 class="chart-card-title">Spending Trend</h3>
+            <div class="trend-chart-container">
+              <svg id="trend-svg" class="trend-chart" viewBox="0 0 500 220" preserveAspectRatio="none">
+                <!-- Trend line drawn by JS -->
+              </svg>
+              <div class="trend-x-axis" id="trend-x-axis">
+                <span>1st</span>
+                <span>15th</span>
+                <span>31st</span>
+              </div>
+              <div class="trend-chart-overlay" id="trend-chart-empty">
+                <p class="empty-text">No spending data to display trend.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. TRANSACTIONS LEDGER VIEW -->
+      <section id="view-transactions" class="v-view-panel">
+        
+        <!-- Filter Bar -->
+        <div class="v-card v-filter-card">
+          <div class="filter-header">
+            <div class="filter-title">
+              <span class="filter-icon" data-icon="filter"></span>
+              <span>Filter ledger records</span>
+            </div>
+            <button class="v-btn v-btn-ghost v-btn-sm" id="btn-clear-filters">Clear All</button>
+          </div>
+          
+          <div class="filter-controls-grid">
+            <!-- Search Text -->
+            <div class="filter-control">
+              <label for="filter-search" class="filter-label">Search notes</label>
+              <div class="search-input-wrapper">
+                <span class="search-icon" data-icon="search"></span>
+                <input type="text" id="filter-search" class="v-input" placeholder="e.g. Coffee, rent...">
+              </div>
+            </div>
+            
+            <!-- Type Selector -->
+            <div class="filter-control">
+              <label for="filter-type" class="filter-label">Transaction type</label>
+              <select id="filter-type" class="v-input v-select">
+                <option value="all">All Types</option>
+                <option value="expense">Expenses Only</option>
+                <option value="income">Income Only</option>
+              </select>
+            </div>
+            
+            <!-- Category Selector -->
+            <div class="filter-control">
+              <label for="filter-category" class="filter-label">Category</label>
+              <select id="filter-category" class="v-input v-select">
+                <option value="all">All Categories</option>
+                <!-- Filled dynamically by JS -->
+              </select>
+            </div>
+            
+            <!-- Date range start -->
+            <div class="filter-control">
+              <label for="filter-start-date" class="filter-label">Date from</label>
+              <input type="date" id="filter-start-date" class="v-input">
+            </div>
+
+            <!-- Date range end -->
+            <div class="filter-control">
+              <label for="filter-end-date" class="filter-label">Date to</label>
+              <input type="date" id="filter-end-date" class="v-input">
+            </div>
+
+            <!-- Sorting Selector -->
+            <div class="filter-control">
+              <label for="filter-sort" class="filter-label">Sort by</label>
+              <select id="filter-sort" class="v-input v-select">
+                <option value="date-desc">Newest Date</option>
+                <option value="date-asc">Oldest Date</option>
+                <option value="amount-desc">Highest Amount</option>
+                <option value="amount-asc">Lowest Amount</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ledger ledger list -->
+        <div class="ledger-container" id="ledger-list">
+          <!-- Filled dynamically by JS -->
+          <div class="empty-state">
+            <p class="empty-title">No transactions logged yet</p>
+            <p class="empty-desc">Create your first entry to start tracking your finances.</p>
+            <button class="v-btn v-btn-primary" id="btn-add-empty-state">
+              <span class="btn-icon" data-icon="plus"></span>
+              <span>Log Transaction</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. SETTINGS VIEW -->
+      <section id="view-settings" class="v-view-panel">
+        <div class="settings-grid">
+          
+          <!-- Preferences Form Card -->
+          <div class="v-card settings-card">
+            <h3 class="settings-title">App Preferences</h3>
+            
+            <div class="settings-form">
+              <!-- Budget limit setting -->
+              <div class="settings-group">
+                <label for="setting-budget" class="settings-label">Monthly Budget Limit</label>
+                <input type="number" id="setting-budget" class="v-input" min="0" placeholder="e.g. 50000">
+                <span class="settings-hint">The target spending limit shown on your dashboard.</span>
+              </div>
+              
+              <!-- Currency Symbol setting -->
+              <div class="settings-group">
+                <label for="setting-currency-symbol" class="settings-label">Currency Symbol</label>
+                <input type="text" id="setting-currency-symbol" class="v-input" placeholder="e.g. ₹, $, €">
+                <span class="settings-hint">Used for prefixing amounts in statistics and lists.</span>
+              </div>
+              
+              <!-- Currency Code (Intl formatting) -->
+              <div class="settings-group">
+                <label for="setting-currency-code" class="settings-label">Currency ISO Code</label>
+                <select id="setting-currency-code" class="v-input v-select">
+                  <option value="INR">INR (₹)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="AED">AED (AED)</option>
+                  <option value="CAD">CAD (C$)</option>
+                  <option value="AUD">AUD (A$)</option>
+                  <option value="JPY">JPY (¥)</option>
+                </select>
+                <span class="settings-hint">Determines number formatting patterns.</span>
+              </div>
+
+              <!-- Start of Week Setting -->
+              <div class="settings-group">
+                <label for="setting-start-of-week" class="settings-label">Start of Week</label>
+                <select id="setting-start-of-week" class="v-input v-select">
+                  <option value="Mon">Monday</option>
+                  <option value="Sun">Sunday</option>
+                </select>
+                <span class="settings-hint">Changes day-grouping metrics display format.</span>
+              </div>
+
+              <button class="v-btn v-btn-primary" id="btn-save-settings">Save Settings</button>
+            </div>
+          </div>
+          
+          <!-- Data Management Card -->
+          <div class="v-card settings-card destructive-card">
+            <h3 class="settings-title">Data Administration</h3>
+            <p class="settings-desc">Manage your backups and storage parameters. All data remains exclusively on your local device.</p>
+            
+            <div class="data-actions-stack">
+              <!-- Backups row -->
+              <div class="data-action-row">
+                <div>
+                  <div class="action-heading">Export Database</div>
+                  <div class="action-desc">Download your transactions in standard CSV format.</div>
+                </div>
+                <button class="v-btn v-btn-secondary" id="btn-export-csv">
+                  <span class="btn-icon" data-icon="download"></span>
+                  <span>Export CSV</span>
+                </button>
+              </div>
+
+              <div class="data-action-row">
+                <div>
+                  <div class="action-heading">Import Database</div>
+                  <div class="action-desc">Restore backups from a previously exported JSON file.</div>
+                </div>
+                <div>
+                  <input type="file" id="import-file-input" accept=".json" class="v-file-input" aria-label="Upload JSON backup">
+                  <label for="import-file-input" class="v-btn v-btn-secondary file-upload-label">
+                    <span class="btn-icon" data-icon="upload"></span>
+                    <span>Import JSON</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="data-action-row reset-row">
+                <div>
+                  <div class="action-heading destructive">Purge Database</div>
+                  <div class="action-desc">Permanently delete all transaction records and restore defaults.</div>
+                </div>
+                <button class="v-btn v-btn-destructive" id="btn-reset-modal">
+                  <span class="btn-icon" data-icon="trash"></span>
+                  <span>Reset App</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+      
+    </main>
+
+    <!-- Floating Action Button (Mobile View Only) -->
+    <button class="v-fab" id="btn-add-fab" aria-label="Add Transaction">
+      <span class="fab-icon" data-icon="plus"></span>
+    </button>
+    
+    <!-- TRANSACTION EDITOR DRAWER (MODAL) -->
+    <div class="v-modal-overlay" id="drawer-overlay" aria-hidden="true" role="dialog">
+      <div class="v-drawer" id="drawer-container" tabindex="-1">
+        
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+          <h2 class="drawer-title" id="drawer-title-text">Add Transaction</h2>
+          <button class="drawer-close-btn" id="btn-drawer-close" aria-label="Close form">
+            <span data-icon="x"></span>
+          </button>
+        </div>
+        
+        <!-- Drawer Content Form -->
+        <form class="drawer-form" id="transaction-form" novalidate>
+          <input type="hidden" id="form-tx-id">
+          
+          <!-- Transaction Type Toggle -->
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <div class="segmented-control" role="radiogroup" aria-label="Transaction Type">
+              <label class="segment-option">
+                <input type="radio" name="tx-type" value="expense" checked>
+                <span class="segment-label">Expense</span>
+              </label>
+              <label class="segment-option">
+                <input type="radio" name="tx-type" value="income">
+                <span class="segment-label">Income</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Amount Input -->
+          <div class="form-group">
+            <label for="form-amount" class="form-label">Amount <span class="required">*</span></label>
+            <div class="amount-input-wrapper">
+              <span class="amount-symbol" id="form-currency-symbol">₹</span>
+              <input type="number" id="form-amount" class="v-input" placeholder="0.00" min="0.01" step="0.01" required>
+            </div>
+            <div class="form-error-msg" id="error-amount">Amount must be greater than 0</div>
+          </div>
+          
+          <!-- Category Select -->
+          <div class="form-group">
+            <label for="form-category" class="form-label">Category <span class="required">*</span></label>
+            <select id="form-category" class="v-input v-select" required>
+              <option value="" disabled selected>Select category...</option>
+              <!-- Populated dynamically -->
+            </select>
+            <div class="form-error-msg" id="error-category">Category is required</div>
+          </div>
+          
+          <!-- Date Input -->
+          <div class="form-group">
+            <label for="form-date" class="form-label">Date <span class="required">*</span></label>
+            <input type="date" id="form-date" class="v-input" required>
+            <div class="form-error-msg" id="error-date">Please specify a valid date</div>
+          </div>
+          
+          <!-- Optional Payment Method -->
+          <div class="form-group">
+            <label for="form-payment" class="form-label">Payment Method</label>
+            <select id="form-payment" class="v-input v-select">
+              <option value="" selected>None / Optional</option>
+              <option value="UPI">UPI / GPay</option>
+              <option value="Card">Credit / Debit Card</option>
+              <option value="Cash">Cash</option>
+              <option value="Net Banking">Net Banking</option>
+            </select>
+          </div>
+          
+          <!-- Optional Note -->
+          <div class="form-group">
+            <label for="form-note" class="form-label">Note / Details</label>
+            <textarea id="form-note" class="v-input v-textarea" rows="3" placeholder="e.g. Starbucks, rent sharing..."></textarea>
+            <div class="form-error-msg" id="error-note">Please enter valid text (maximum 100 characters)</div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="drawer-actions">
+            <button type="button" class="v-btn v-btn-ghost" id="btn-drawer-cancel">Cancel</button>
+            
+            <div class="drawer-actions-right">
+              <button type="button" class="v-btn v-btn-destructive hide" id="btn-drawer-delete">
+                <span class="btn-icon" data-icon="trash"></span>
+                <span>Delete</span>
+              </button>
+              <button type="submit" class="v-btn v-btn-primary" id="btn-drawer-submit">Save Record</button>
+            </div>
+          </div>
+        </form>
+        
+      </div>
+    </div>
+
+    <!-- PURGE DATABASE CONFIRMATION DIALOG (MODAL) -->
+    <div class="v-modal-overlay" id="confirm-modal-overlay" aria-hidden="true" role="dialog">
+      <div class="v-dialog-card" id="confirm-dialog" tabindex="-1">
+        <h2 class="dialog-title">Delete Ledger Database?</h2>
+        <p class="dialog-desc">This action is permanent. All transactions will be deleted and your configurations reset. This action cannot be undone.</p>
+        <div class="dialog-actions">
+          <button class="v-btn v-btn-secondary" id="btn-confirm-cancel">Cancel Action</button>
+          <button class="v-btn v-btn-destructive" id="btn-confirm-reset">Yes, Reset Data</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CORRUPTED DATA RECOVERY DIALOG (MODAL) -->
+    <div class="v-modal-overlay" id="corrupt-modal-overlay" aria-hidden="true" role="dialog">
+      <div class="v-dialog-card error-dialog" id="corrupt-dialog" tabindex="-1">
+        <div class="dialog-title-row">
+          <span class="dialog-icon-error" data-icon="alert"></span>
+          <h2 class="dialog-title">Local Database Corrupted</h2>
+        </div>
+        <p class="dialog-desc">We encountered an error loading your financial records from this browser's local storage. This can happen if storage was cleared or edited externally.</p>
+        <p class="dialog-desc font-accent">To recover, the app must reset to a clean state. We recommend clicking "Export Corrupted Data" first to try and save any text records.</p>
+        <div class="dialog-actions">
+          <button class="v-btn v-btn-secondary" id="btn-corrupt-export">Export Text Dump</button>
+          <button class="v-btn v-btn-destructive" id="btn-corrupt-reset">Reset Storage</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERT SNACKBAR / TOAST CONTAINER -->
+    <div class="v-snackbar-container" id="snackbar-container">
+      <!-- Toasts inserted programmatically -->
+    </div>
+    
+  </div>
+
+  <!-- App Main Bundle -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
